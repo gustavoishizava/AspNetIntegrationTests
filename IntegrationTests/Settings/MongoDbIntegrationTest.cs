@@ -2,13 +2,13 @@ using Mongo2Go;
 
 namespace IntegrationTests.Settings;
 
-public sealed class MongoDbIntegrationTest
+public static class MongoDbIntegrationTest
 {
-    private MongoDbRunner? _mongoDbRunner;
+    private static MongoDbRunner? _mongoDbRunner;
 
-    public string GetConnectionString()
+    public static string GetConnectionString()
     {
-        _mongoDbRunner = MongoDbRunner.Start();
+        _mongoDbRunner ??= MongoDbRunner.Start();
         return _mongoDbRunner.ConnectionString;
     }
 }

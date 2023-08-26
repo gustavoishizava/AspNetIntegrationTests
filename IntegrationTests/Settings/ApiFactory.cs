@@ -11,13 +11,6 @@ namespace IntegrationTests.Settings;
 
 public sealed class ApiFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    private readonly MongoDbIntegrationTest _mongo2GoIntegrationTest;
-
-    public ApiFactory()
-    {
-        _mongo2GoIntegrationTest = new();
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         // Alterar ambiente para testing
@@ -44,7 +37,7 @@ public sealed class ApiFactory<TProgram> : WebApplicationFactory<TProgram> where
 
             services.AddSingleton((_) =>
             {
-                var mongoClient = new MongoClient(_mongo2GoIntegrationTest.GetConnectionString());
+                var mongoClient = new MongoClient(MongoDbIntegrationTest.GetConnectionString());
                 return mongoClient.GetDatabase("api_db_integration_test_m2g");
             });
 
