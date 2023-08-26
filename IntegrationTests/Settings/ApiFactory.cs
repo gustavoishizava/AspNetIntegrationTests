@@ -4,12 +4,20 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Driver;
 using Moq.AutoMock;
 
 namespace IntegrationTests.Settings;
 
 public sealed class ApiFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
+    private readonly MongoDbIntegrationTest _mongo2GoIntegrationTest;
+
+    public ApiFactory()
+    {
+        _mongo2GoIntegrationTest = new();
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         // Alterar ambiente para testing
@@ -26,6 +34,19 @@ public sealed class ApiFactory<TProgram> : WebApplicationFactory<TProgram> where
             var autoMocker = new AutoMocker();
             var serviceBusPublisher = autoMocker.CreateInstance<ServiceBusPublisher>();
             services.AddSingleton<IPublisher<Client>>(serviceBusPublisher);
+
+            #endregion
+
+            #region Trocando o MongoDB pelo Mongo2Go
+
+            var mongoDbDescriptor = services.First(x => x.ServiceType == typeof(IMongoDatabase));
+            services.Remove(mongoDbDescriptor);
+
+            services.AddSingleton((_) =>
+            {
+                var mongoClient = new MongoClient(_mongo2GoIntegrationTest.GetConnectionString());
+                return mongoClient.GetDatabase("api_db_integration_test_m2g");
+            });
 
             #endregion
         });
