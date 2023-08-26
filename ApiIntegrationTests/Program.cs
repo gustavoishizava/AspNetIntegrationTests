@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton((_) =>
 {
     var mongoClient = new MongoClient(builder.Configuration.GetConnectionString("MongoDB"));
-    return mongoClient.GetDatabase("api_test_integration");
+    return mongoClient.GetDatabase(builder.Configuration["DatabaseName"]);
 });
 
 builder.Services.AddSingleton<IClientRepository, ClientRepository>();
@@ -34,3 +34,4 @@ app.MapControllers();
 
 app.Run();
 
+public partial class Program { }
