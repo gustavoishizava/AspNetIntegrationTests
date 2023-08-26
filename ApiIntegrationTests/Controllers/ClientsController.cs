@@ -1,6 +1,7 @@
 ﻿using System.Net.Mime;
 using ApiIntegrationTests.Data;
 using ApiIntegrationTests.Domain;
+using ApiIntegrationTests.Infrastructure;
 using ApiIntegrationTests.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,12 @@ namespace ApiIntegrationTests.Controllers
     public class ClientsController : ControllerBase
     {
         private readonly IClientRepository _repository;
+        private readonly IPublisher<Client> _publisher;
 
-        public ClientsController(IClientRepository repository)
+        public ClientsController(IClientRepository repository, IPublisher<Client> publisher)
         {
             _repository = repository;
+            _publisher = publisher;
         }
 
         // GET api/values/5
@@ -42,6 +45,7 @@ namespace ApiIntegrationTests.Controllers
                 return BadRequest(new ErrorResponse { Error = $"Id={client.Id} already exists." });
 
             await _repository.AddAsync(client);
+            await _publisher.PublishAsync(client);
             return Created($"api/clients/{client.Id}", client);
         }
     }

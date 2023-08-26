@@ -1,4 +1,7 @@
 ﻿using ApiIntegrationTests.Data;
+using ApiIntegrationTests.Domain;
+using ApiIntegrationTests.Infrastructure;
+using Azure.Messaging.ServiceBus.Administration;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,9 @@ builder.Services.AddSingleton((_) =>
 });
 
 builder.Services.AddSingleton<IClientRepository, ClientRepository>();
+
+builder.Services.AddSingleton<IPublisher<Client>, ServiceBusPublisher>();
+builder.Services.AddSingleton((_) => new ServiceBusAdministrationClient(builder.Configuration.GetConnectionString("ServiceBus")));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
